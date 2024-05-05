@@ -1,118 +1,65 @@
-"use strict";
-/* -------------------------------------------------------
-    NODEJS EXPRESS | CLARUSWAY FullStack Team
-------------------------------------------------------- */
-const { mongoose } = require("../configs/dbConnection");
-/* ------------------------------------------------------- *
-{
-    "username": "admin",
-    "password": "aA*123456",
-    "email": "admin@site.com",
-    "firstName": "admin",
-    "lastName": "admin",
-    "isActive": true,
-    "isStaff": true,
-    "isAdmin": true
-}
-{
-    "username": "staff",
-    "password": "aA*123456",
-    "email": "staff@site.com",
-    "firstName": "staff",
-    "lastName": "staff",
-    "isActive": true,
-    "isStaff": true,
-    "isAdmin": false
-}
-{
-    "username": "test",
-    "password": "aA*123456",
-    "email": "test@site.com",
-    "firstName": "test",
-    "lastName": "test",
-    "isActive": true,
-    "isStaff": false,
-    "isAdmin": false
-}
-
+/* ------------------------------------------------------- 
+                        USER MODEL
 /* ------------------------------------------------------- */
-// User Model:
 
-const passwordEncrypt = require("../helpers/passwordEncrypt");
+// 1- öncelikle mongoose connectionunu sağla
 
-const UserSchema = new mongoose.Schema(
+const { Schema } = require("mongoose");
+const { mongoose } = require("../configs/dbConnection");
+
+// 2- Şemayı oluştur
+const UserSchema = new Schema(
   {
+    // tablolarımızdaki fieldlarımız ve özellikleri
     username: {
+      type: String,
+      trim: true,
+      required: true,
+      unique: true,
+      // çok fazla erişim yapacağımız için kolay erişim sağlayabilmesi için index özelliğini ekledik.
+      index: true,
+    },
+    password: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    email: {
       type: String,
       trim: true,
       required: true,
       unique: true,
       index: true,
     },
-
-    password: {
+    firstName: {
       type: String,
       trim: true,
       required: true,
-      set: (password) => passwordEncrypt(password),
-      // selected:false
     },
-
-    email: {
+    lastName: {
       type: String,
       trim: true,
-      required: [true, "Email field must be required"],
-      unique: [true, "There is this email. Email field must be unique"],
-      index:true,
-      // validate: [
-      //     (email) => email.includes('@') && email.includes('.'),
-      //     'Email type is not correct.'
-      // ]
-      // email regex /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-      // regexr.com for test
-      validate: [
-        // (email) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
-        // 'Email type is not correct.'
-        (email) => {
-          const regexEmailCheck =
-            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-          return regexEmailCheck.test(email);
-        },
-        "Email type is not correct.",
-      ],
+      required: true,
     },
-
-    // firstName: String,
-    firstName:{
-        type:String,
-        trim:true,
-        required:true,
-    },
-
-    // lastName: String,
-    firstName:{
-        type:String,
-        trim:true,
-        required:true,
-    },
-
     isActive: {
       type: Boolean,
       default: true,
     },
-
     isStaff: {
       type: Boolean,
       default: false,
     },
-
     isAdmin: {
       type: Boolean,
       default: false,
     },
   },
-  { collection: "users", timestamps: true }
+  {
+    // ilk alan tablo isimleri, küçük harfle yazılır.
+    collection: "users",
+    timestamps: true,
+  }
 );
 
-/* ------------------------------------------------------- */
+// 3- export et, ilk alan modül adı, ikinci alan ise neye göre model oluşturulacak.
 module.exports = mongoose.model("User", UserSchema);
