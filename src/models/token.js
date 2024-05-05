@@ -1,33 +1,32 @@
-"use strict"
+"use strict";
+
+const { Schema } = require("mongoose");
 /* -------------------------------------------------------
-    NODEJS EXPRESS | CLARUSWAY FullStack Team
+    NODEJS EXPRESS | STOCK API
 ------------------------------------------------------- */
-const { mongoose } = require('../configs/dbConnection')
-/* ------------------------------------------------------- *
-{
-  "userId": "65343222b67e9681f937f001",
-  "token": "...tokenKey..."
-}
-/* ------------------------------------------------------- */
-// Token Model:
 
-const TokenSchema = new mongoose.Schema({
+// TOKEN MODEL
 
+// create ya da login olan kullanıcıları için bir token oluşturulacağı için burada userModeli ref alıp her bir user için bir token modeli oluşturuyoruz.
+
+const mongoose = require("../configs/dbConnection");
+
+const TokenSchema = new Schema(
+  {
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-        index: true,
-    }, 
-
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
     token: {
-        type: String,
-        trim: true,
-        required: true,
-        index: true,
-    }, 
+      type: String,
+      trim: true,
+      required: true,
+      index: true,
+    },
+  },
+  { collection: "token", timestamps: true }
+);
 
-}, { collection: 'tokens', timestamps: true })
-
-/* ------------------------------------------------------- */
-module.exports = mongoose.model('Token', TokenSchema)
+module.exports = mongoose.model("Token", TokenSchema);

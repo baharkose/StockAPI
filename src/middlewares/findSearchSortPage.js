@@ -59,6 +59,8 @@ module.exports = (req, res, next) => {
   // Run for output:
   //   veritanabınından veri çekmek için
 
+  //   ! middleware içerisinde res ve req parametreleri ile tekrar require, import vs. işlemi yapmadan direk olarak yazdığımız fonksiyonlara her yerden erişebiliriz. Middlewarelerde req ve res nesnelerine yeni özellik ve fonksiyonlar ekleyebiliyoruz. burada da getModelList ve getModelistDetails fonksiyonları eklenmiş
+
   res.getModelList = async (Model, customFilter = {}, populate = null) => {
     // Model.find() metodu, veritabanında belirli kriterlere göre döküman arar. { ...filter, ...search } ifadesi, filter ve search nesnelerinden alınan anahtar-değer çiftlerini sorgu nesnesi olarak birleştirir.
     return await Model.find({ ...filter, ...search, ...customFilter })
