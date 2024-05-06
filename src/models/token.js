@@ -1,17 +1,14 @@
 "use strict";
-
-const { Schema } = require("mongoose");
 /* -------------------------------------------------------
     NODEJS EXPRESS | STOCK API
 ------------------------------------------------------- */
 
 // TOKEN MODEL
+const { mongoose } = require("../configs/dbConnection");
 
 // create ya da login olan kullanıcıları için bir token oluşturulacağı için burada userModeli ref alıp her bir user için bir token modeli oluşturuyoruz.
 
-const mongoose = require("../configs/dbConnection");
-
-const TokenSchema = new Schema(
+const TokenSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
