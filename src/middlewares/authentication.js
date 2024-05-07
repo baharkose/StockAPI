@@ -1,34 +1,37 @@
-"use strict"
+"use strict";
 /* -------------------------------------------------------
-    NODEJS EXPRESS | CLARUSWAY FullStack Team
+    NODEJS EXPRESS | STOCK API
 ------------------------------------------------------- */
 // app.use(authentication)
 
-const Token = require('../models/token')
-const jwt = require('jsonwebtoken')
+const Token = require("../models/token");
+const jwt = require("jsonwebtoken");
 
 module.exports = async (req, res, next) => {
+  const auth = req.headers?.authorization || null; // Token ...tokenKey...
+  const tokenKey = auth ? auth.split(" ") : null; // ['Token', '...tokenKey...']
 
-    const auth = req.headers?.authorization || null // Token ...tokenKey...
-    const tokenKey = auth ? auth.split(' ') : null // ['Token', '...tokenKey...']
+  if (tokenKey) {
+    if (tokenKey[0] == "Token") {
+      // SimpleToken:
 
-    if (tokenKey) {
+      // eşleşen bir kayıt varsa kullanıcı bilgisini req.user içerisine yerleştir.
 
-        if (tokenKey[0] == 'Token') {
-        // SimpleToken:
+      const tokenData = await Token.findOne({ token: tokenKey[1] }).populate(
+        "userId"
+      );
+      // usera ait diğer bilgileri populate ile getir.
+      req.user = tokenData ? tokenData.userId : undefined;
+    } else if (tokenKey[0] == "Bearer") {
+      // JWT:
 
-            const tokenData = await Token.findOne({ token: tokenKey[1] }).populate('userId')
-            req.user = tokenData ? tokenData.userId : undefined
-
-        } else if (tokenKey[0] == 'Bearer') {
-        // JWT:
-
-            jwt.verify(tokenKey[1], process.env.ACCESS_KEY, (error, data) => {
-                // //? Hata gösterimi yok:
-                req.user = data
-            })
-        }
+      // tokeni belitrilen accessKey ile doğrula.ve req.user içerisine yerleştir
+      jwt.verify(tokenKey[1], process.env.ACCESS_KEY, (error, data) => {
+        // //? Hata gösterimi yok:
+        req.user = data;
+      });
     }
+  }
 
-        next()
-    }
+  next();
+};

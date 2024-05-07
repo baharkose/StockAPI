@@ -39,6 +39,8 @@ module.exports = {
     // kullanıcı sadece kendi kayıtlarını görebilir. Bunun için customFilter hazırlıyoruz.
 
     // Eğer kişi admin değilse sadece kendini görüntüleyebilsin. Diğer kullanıcıları görüntülemesin
+
+    // * buradaki req.user -> authentication middleware'inden gelir. req.user bizim tokenDatamız, tokenData'ya populate ile useridyi aldık.
     const customFilter = req.user?.isAdmin ? {} : { _id: req.user._id };
     const data = await getModelList(User, customFilter);
     res.status(200).send({
