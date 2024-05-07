@@ -157,13 +157,17 @@ module.exports = {
       #swagger.summary="Delete User"
     */
 
-    // Kimse kendisini silemez
+    // Kimse kendisini silemez. Burada silme işlemini yalnızca admin yapabilir. Ancak isAdmin kontrolünü biz permissionlarla da yapabiliriz. O nedenle ekstradan burada yapmamıza gerek kalmadı.
     if (req.user._id != req.params.id) {
       const data = await User.deleteOne({ _id: req.params.id });
 
       res
         .status(data.deletedCount ? 204 : 404)
         .send({ error: !data.deletedCount, data });
+    } else {
+      // Admin de kendisini silemez.
+      res.errorStatusCode = 403;
+      throw new Error("You can not remove yourself");
     }
   },
 };
