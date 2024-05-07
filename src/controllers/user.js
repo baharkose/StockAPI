@@ -103,9 +103,67 @@ module.exports = {
       ? { _id: req.params._id }
       : { _id: req.user._id };
 
-    // buradaki user_id bizim context ya da redux ile sakladığımız user bilgisi, yine bize req ile gelebilir.
-    const data = User.findOne(customFilter);
+    // buradaki req.user bizim authentication middlewarei kullarak yazdığımız tokenla birlikte gelen req.userdır.
+    const data = await User.findOne(customFilter);
+    res.status(200).send({
+      error: false,
+      data,
+    });
   },
-  update: {},
-  delete: {},
+  update: async (req, res) => {
+    /*
+      #swagger.tags = ["Users"]
+      #swagger.summary= "Update User"
+      #swagger.paramters['body'] = {
+        in: "body",
+        required: true,
+        schema: {
+          "username": "test",
+                    "password": "1234",
+                    "email": "test@site.com",
+                    "firstName": "test",
+                    "lastName": "test",
+        }
+      }
+    */
+
+    //! create'te kullanıcı ne yaparsa yapsın isAdmin ve isStaff false olsun demiştik burada ise hiçbir şekilde müdahale edilmesin false dahi değişikliği yapılamasın istiyoruz. isStaff kendini ya da isAdmin kendini false'yapamaz.
+    if (req.user?.isAdmin) {
+      delete req.body.isAdmin;
+      delete req.body.isStaff;
+    }
+
+    // eğer kullanıcı admin ise parametredeki idye göre kişiyi güncelleyebilir. Ancak admin değilse sadece kendisini güncelleyebilir.
+
+    // SADECE KENDİ KAYDINI GÜNCELLEYEBİLİR
+    const customFilter = req.user?.isAdmin
+      ? { _id: req.params.id }
+      : { _id: req.user.id };
+
+    const data = await User.updateOne(customFilter, req.body, {
+      runValidators: true,
+      // runValidators: true seçeneği, bu tür bir güncelleme işlemi sırasında da şema doğrulayıcılarının aktif olmasını sağlar. Böylece veritabanınıza yanlışlıkla şemanıza uygun olmayan veri girilmesinin önüne geçilmiş olur.
+    });
+    res.status(202).send({
+      error: false,
+      data,
+      // !gelen yeni datayı görüntüle
+      new: await User.findOne(customFilter),
+    });
+  },
+  delete: async (req, res) => {
+    /*
+      #swagger.tags=["Users"]
+      #swagger.summary="Delete User"
+    */
+
+    // Kimse kendisini silemez
+    if (req.user._id != req.params.id) {
+      const data = await User.deleteOne({ _id: req.params.id });
+
+      res
+        .status(data.deletedCount ? 204 : 404)
+        .send({ error: !data.deletedCount, data });
+    }
+  },
 };
