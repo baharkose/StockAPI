@@ -9,9 +9,9 @@
 module.exports = {
   isLogin: (req, res, next) => {
     // set passive
-    // return next()
+    // return next() -> çalıştırma pass geç
 
-    // req user içerisinde bilgi varsa ve bu kullanıcı banlanmadıysa o zaman isLogin yap. Devam et.yoksa 403 hata kodu yolla.
+    // req user içerisinde bilgi varsa ve bu kullanıcı banlanmadıysa o zaman isLogindir. Geçiş izni ver. Devam et.yoksa 403 hata kodu yolla.
     if (req.user && req.user.isActive) {
       next();
     } else {
@@ -20,14 +20,17 @@ module.exports = {
     }
   },
   isAdmin: (req, res, next) => {
-    if (req.user?.isAdmin && req.user.isActive) {
+    // return next()
+    // only admin
+    if (req.user && req.user?.isAdmin && req.user.isActive) {
       next();
     } else {
       res.errorStatusCode(403).send("No permission: You must be admin");
     }
   },
   isStaff: (req, res, next) => {
-    if (req.user?.isStaff && req.user?.isActive) {
+    // return next()
+    if (req.user && req.user?.isStaff && req.user?.isActive) {
       next();
     } else {
       res.errorStatusCode(403).send("No permission: You must be staff");
