@@ -1,18 +1,12 @@
 "use strict";
 /* -------------------------------------------------------
-    NODEJS EXPRESS | STOCK API
+    NODEJS EXPRESS | STOCKAPI
 ------------------------------------------------------- */
 const router = require("express").Router();
-/* ------------------------------------------------------- */
-// routes/auth:
-
 const auth = require("../controllers/auth");
+// URL: auth
+router.post("/login", auth.login); // SimpleToken & JWT
+router.post("/refresh", auth.refresh); // JWT Refresh
+router.get("/logout", auth.logout); // SimpleToken Logout
 
-// URL: /auth
-
-router.post("/login", auth.login);
-router.post("/refresh", auth.refresh);
-router.get("/logout", auth.logout);
-
-/* ------------------------------------------------------- */
 module.exports = router;

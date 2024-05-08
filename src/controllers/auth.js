@@ -32,25 +32,33 @@ module.exports = {
 
     if ((username || email) && password) {
       const user = await User.findOne({
-        // username ya da emailden biri var ise, $or komutu için dizi içerisine alıyoruz.
+        // username ya da emailden biri var ise, $or komutu için dizi içerisine alıyoruz. User dbsinde username ya da email adında bir kullanıcı var mı
         $or: [{ username }, { email }],
       });
 
+      // kullanıcı varsa ve şifres, (gelen şifre kriptolanmış o nedenle kullanıcın gönderdiği şifreyi de kriptoluyoruz.)
       if (user && user.password == passwordEncrypt(password)) {
+        // kullanıcı banlanmış mı?
         if (user.isActive) {
           // TOKEN
+
+          // userid ile eşleşen token bilgilerini getir.
           let tokenData = await Token.findOne({ userId: user._id });
+          // eğer token bilgisi yoksa yeni bir token oluştur.
           if (!tokenData)
             tokenData = await Token.create({
               userId: user._id,
+              // şifreli bir token oluştur
               token: passwordEncrypt(user._id + Date.now()),
             });
 
           // JWT
+          // accessToken kısa süreli, refresh token uzun süreli
           const accessToken = jwt.sign(user.toJSON(), process.env.ACCESS_KEY, {
             expiresIn: "30m",
           });
           const refreshToken = jwt.sign(
+            // user id ve password varsa refreshle
             { _id: user._id, password: user.password },
             process.env.REFRESH_KEY,
             { expiresIn: "3d" }
@@ -61,10 +69,12 @@ module.exports = {
             bearer: { accessToken, refreshToken, user },
           });
         } else {
+          // kullanıcı banlanmış
           res.errorStatusCode = 401;
           throw new Error("This account is not active");
         }
       } else {
+        // kullanıcı yoksa önce doğru şekilde giriş yapınız
         res.errorStatusCode = 401;
         throw new Error("Please enter username/email & password");
       }
@@ -152,7 +162,7 @@ module.exports = {
         message = "Token is deleted, Logout was OK.";
       } else {
         // JWT
-        message = "No nedd any process for logout. You must delete JWT tokens";
+        message = "No need any process for logout. You must delete JWT tokens";
       }
     }
     res.send({
