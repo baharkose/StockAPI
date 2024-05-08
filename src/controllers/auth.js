@@ -2,172 +2,163 @@
 /* -------------------------------------------------------
     NODEJS EXPRESS | STOCK API
 ------------------------------------------------------- */
-// Auth Controller
 
+// AUTH CONTROLLER
+// kullanıcıların sisteme giriş yapma, token ile kimlik tazeleme, ve çıkış yapma, tokenlarla kullanıcı sisteme giriş yaptı mı ve bu kullanıcı kim
+
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Token = require("../models/token");
 const passwordEncrypt = require("../helpers/passwordEncrypt");
-const jwt = require("jsonwebtoken");
 
 module.exports = {
   login: async (req, res) => {
     /*
-            #swagger.tags = ["Authentication"]
-            #swagger.summary = "Login"
-            #swagger.description = 'Login with username (or email) and password for get simpleToken and JWT'
-            #swagger.parameters["body"] = {
-                in: "body",
-                required: true,
-                schema: {
-                    "username": "test",
-                    "password": "1234",
-                }
-            }
-        */
+      #swagger.tags = ["Authentication"]
+      #swagger.summary ="Login"
+      #swagger.description = "Login with username (or email) and password for get Token and JWT"
+      #swagger.parameters["body"] = {
+        in:"body",
+        required:true,
+        schema:{
+          "username":"test",
+          "password":"Aa*123456"
+        }
+      }
+    */
 
     const { username, email, password } = req.body;
+    // kullanıcıdan gelen email, passowrd ve username bilgilerini al.
 
     if ((username || email) && password) {
-      // const user = await User.findOne({ username })
-      const user = await User.findOne({ $or: [{ username }, { email }] });
+      const user = await User.findOne({
+        // username ya da emailden biri var ise, $or komutu için dizi içerisine alıyoruz.
+        $or: [{ username }, { email }],
+      });
 
       if (user && user.password == passwordEncrypt(password)) {
         if (user.isActive) {
-          /* TOKEN */
-
+          // TOKEN
           let tokenData = await Token.findOne({ userId: user._id });
-
-          if (!tokenData) {
-            const tokenKey = passwordEncrypt(user._id + Date.now());
+          if (!tokenData)
             tokenData = await Token.create({
               userId: user._id,
-              token: tokenKey,
+              token: passwordEncrypt(user._id + Date.now()),
             });
-          }
 
-          /* TOKEN */
-
-          /* JWT */
-
-          const accessData = user.toJSON(); // Valuable data.
-          const accessTime = "30m";
-          const accessToken = jwt.sign(accessData, process.env.ACCESS_KEY, {
-            expiresIn: accessTime,
+          // JWT
+          const accessToken = jwt.sign(user.toJSON(), process.env.ACCESS_KEY, {
+            expiresIn: "30m",
           });
-          // console.log('accessToken', accessToken)
-
-          const refreshData = { id: user._id, password: user.password }; // Checkable data.
-          const refreshTime = "3d";
-          const refreshToken = jwt.sign(refreshData, process.env.REFRESH_KEY, {
-            expiresIn: refreshTime,
-          });
-          // console.log('refreshToken', refreshToken)
-
-          /* JWT */
-
-          res.status(200).send({
+          const refreshToken = jwt.sign(
+            { _id: user._id, password: user.password },
+            process.env.REFRESH_KEY,
+            { expiresIn: "3d" }
+          );
+          res.send({
             error: false,
             token: tokenData.token,
-            bearer: {
-              access: accessToken,
-              refresh: refreshToken,
-            },
-            user,
+            bearer: { accessToken, refreshToken, user },
           });
         } else {
           res.errorStatusCode = 401;
-          throw new Error("This account is not active.");
+          throw new Error("This account is not active");
         }
       } else {
         res.errorStatusCode = 401;
-        throw new Error("Wrong username or password.");
+        throw new Error("Please enter username/email & password");
       }
-    } else {
-      res.errorStatusCode = 401;
-      throw new Error("Please enter username and password.");
     }
   },
-
   refresh: async (req, res) => {
     /*
-            #swagger.tags = ['Authentication']
-            #swagger.summary = 'JWT: Refresh'
-            #swagger.description = 'Refresh accessToken with refreshToken'
-            #swagger.parameters['body'] = {
-                in: 'body',
-                required: true,
-                schema: {
-                    bearer: {
-                        refresh: '...refreshToken...'
-                    }
+        #swagger.tags = ['Authentication']
+        #swagger.summary = 'JWT: Refresh'
+        #swagger.description = 'Refresh access-token by refresh-token.'
+        #swagger.parameters['body'] = {
+            in: 'body',
+            required: true,
+            schema: {
+                bearer: {
+                    refresh: '___refreshToken___'
                 }
             }
-        */
+        }
+    */
 
-    const refreshToken = req.body?.bearer?.refresh;
+    const refreshToken = req.body?.bearer?.refreshToken;
 
     if (refreshToken) {
-      const jwtData = await jwt.verify(refreshToken, process.env.REFRESH_KEY);
+      jwt.verify(
+        refreshToken,
+        process.env.REFRESH_KEY,
+        async function (err, userData) {
+          if (err) {
+            res.errorStatusCode = 401;
+            throw err;
+          } else {
+            const { _id, password } = userData;
 
-      if (jwtData) {
-        const { id, password } = jwtData;
+            if (_id && password) {
+              const user = await User.findOne({ _id });
 
-        if (id && password) {
-          const user = await User.findOne({ _id: id });
+              if (user && user.password == password) {
+                if (user.isActive) {
+                  // JWT:
+                  const accessToken = jwt.sign(
+                    user.toJSON(),
+                    process.env.ACCESS_KEY,
+                    { expiresIn: "30m" }
+                  );
 
-          if (user && user.password == password) {
-            if (user.isActive) {
-              // JWT AccessToken:
-              const accessToken = jwt.sign(
-                user.toJSON(),
-                process.env.ACCESS_KEY,
-                { expiresIn: "30m" }
-              );
-
-              res.status(200).send({
-                error: false,
-                bearer: {
-                  access: accessToken,
-                },
-              });
+                  res.send({
+                    error: false,
+                    bearer: { accessToken },
+                  });
+                } else {
+                  res.errorStatusCode = 401;
+                  throw new Error("This account is not active.");
+                }
+              } else {
+                res.errorStatusCode = 401;
+                throw new Error("Wrong id or password.");
+              }
             } else {
               res.errorStatusCode = 401;
-              throw new Error("This account is not active.");
+              throw new Error("Please enter id and password.");
             }
-          } else {
-            res.errorStatusCode = 401;
-            throw new Error("Wrong id or password.");
           }
-        } else {
-          res.errorStatusCode = 401;
-          throw new Error("There is not id and password in refreshToken.");
         }
-      } else {
-        res.errorStatusCode = 401;
-        throw new Error("sa");
-      }
+      );
     } else {
       res.errorStatusCode = 401;
       throw new Error("Please enter token.refresh");
     }
   },
-
   logout: async (req, res) => {
     /*
             #swagger.tags = ["Authentication"]
-            #swagger.summary = "SimpleToken: Logout"
-            #swagger.description = 'Delete token key.'
+            #swagger.summary = "Token: Logout"
+            #swagger.description = 'Delete token-key.'
         */
+    const auth = req.headers?.authorization || null;
+    const tokenKey = aut ? auth.split("") : null;
+    let message = null,
+      result = {};
 
-    const auth = req.headers?.authorization || null; // Token ...tokenKey...
-    const tokenKey = auth ? auth.split(" ") : null; // ['Token', '...tokenKey...']
-
-    const tokenData = await Token.deleteOne({ token: tokenKey[1] });
-
+    if (tokenKey) {
+      if (tokenKey[0] == "Token") {
+        result = await Token.deleteOne({ token: tokenKey[1] });
+        message = "Token is deleted, Logout was OK.";
+      } else {
+        // JWT
+        message = "No nedd any process for logout. You must delete JWT tokens";
+      }
+    }
     res.send({
       error: false,
-      message: "Logout was OK.",
-      data: tokenData,
+      message,
+      result,
     });
   },
 };
