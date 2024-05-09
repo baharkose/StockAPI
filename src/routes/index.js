@@ -18,6 +18,8 @@ router.use("/tokens", require("./token"));
 router.use("/firms", require("./firm"));
 // category:
 router.use("/categories", require("./category"));
+// brand
+router.use("/brands", require("./brand"));
 // // brand:
 // router.use('/brands', require('./brand'))
 // // category:

@@ -5,7 +5,7 @@
 // BRAND MODEL
 const { mongoose } = require("../configs/dbConnection");
 
-const BrandSchema = new mongoose.schema(
+const BrandSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -20,7 +20,7 @@ const BrandSchema = new mongoose.schema(
     },
   },
   {
-    timestapms: true,
+    timestamps: true,
     collection: "brands",
   }
 );
