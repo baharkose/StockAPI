@@ -4,7 +4,7 @@
 ------------------------------------------------------- */
 
 // CATEGORY MODEL
-const mongoose = require("../configs/dbConnection");
+const {mongoose} = require("../configs/dbConnection");
 
 const CategorySchema = new mongoose.Schema(
   {
