@@ -8,12 +8,21 @@ module.exports = {
     /*
         #swagger.tags=["Brands"]
         #swagger.summary="Get Brands"
+        #swagger.description = `
+                You can use <u>filter[] & search[] & sort[] & page & limit</u> queries with endpoint.
+                <ul> Examples:
+                    <li>URL/?<b>filter[field1]=value1&filter[field2]=value2</b></li>
+                    <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>
+                    <li>URL/?<b>sort[field1]=asc&sort[field2]=desc</b></li>
+                    <li>URL/?<b>limit=10&page=1</b></li>
+                </ul>
+            `
     */
     const data = await res.getModelList(Brand);
     res.status(200).send({
       error: false,
       data,
-      detail: await res.getModelListDetails(Category),
+      detail: await res.getModelListDetails(Brand),
     });
   },
   create: async (req, res) => {
@@ -23,7 +32,7 @@ module.exports = {
     */
 
     const data = await Brand.create(req.body);
-    res.status(202).send({
+    res.status(201).send({
       error: false,
       data,
     });
@@ -32,6 +41,7 @@ module.exports = {
     /*
         #swagger.tags=["Brands"]
         #swagger.summary="Get A Brand"
+        
     */
     const data = await Brand.findOne({ _id: req.params.id });
     res.status(200).send({
@@ -43,6 +53,14 @@ module.exports = {
     /*
         #swagger.tags=["Brands"]
         #swagger.summary="Update A Brand"
+        #swagger.parameters['body'] = {
+                in: 'body',
+                required: true,
+                schema: {
+                    "name": "Brand 1",
+                    "image": "http://imageURL"
+                }
+            }
     */
     const data = await Brand.updateOne({ _id: req.params.id }, req.body, {
       runValidators: true,
