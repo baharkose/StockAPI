@@ -44,10 +44,7 @@ const FirmSchema = mongoose.Schema(
       default: "",
     },
   },
-  {
-    timestamps: true,
-    collection: "firm",
-  }
+  { collection: "firm", timestamps: true }
 );
 
 module.exports = mongoose.model("Firms", FirmSchema);
