@@ -1,6 +1,6 @@
 "use strict"
 /* -------------------------------------------------------
-    NODEJS EXPRESS | CLARUSWAY STOCK API
+    NODEJS EXPRESS | STOCK API
 ------------------------------------------------------- */
 const router = require('express').Router()
 /* ------------------------------------------------------- */

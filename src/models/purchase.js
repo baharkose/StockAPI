@@ -18,7 +18,7 @@ const PurchaseSchema = new mongoose.Schema(
       required: true,
     },
     productId: {
-      type: mongoose.Type.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "Product",
       required: true,
     },
@@ -47,4 +47,4 @@ const PurchaseSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.Model("Purchase", PurchaseSchema);
+module.exports = mongoose.model("Purchase", PurchaseSchema);
