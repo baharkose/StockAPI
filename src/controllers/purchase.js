@@ -101,14 +101,18 @@ module.exports = {
             }
         */
     if (req.body?.quantity) {
+      //ui tarafında quantity arttığında backende gelen requestin body kısmında güncellenmiş quantity bilgisi olur. req.bodynin içerisinde bir miktar var ise, findOne ile purchase bilgilerini getir.
       const currentPurchase = await Purchase.findOne({ _id: req.params.id });
 
+      // veritabanındaki quantity ve req.bodyden gelen quantity bilgilerinin farkı alınır ve gerçek miktar hesaplanır.
       const quantity = req.body.quantity - currentPurchase.quantity;
 
+      // ardından purchase ve product bilgileri güncellenir. Ürün tablosundaki quantityi bir arttır.
       const updateProduct = await Product.updateOne(
         { _id: currentPurchase.productId },
         { $inc: { quantity: +quantity } }
       );
+      // quantity zaten req.paramsta artmış olduğu için purchase'de direk arttırdık.
       const data = await Purchase.updateOne({ _id: req.params.id }, req.body, {
         runValidators: true,
       });
@@ -126,6 +130,8 @@ module.exports = {
             #swagger.summary = "Delete Purchase"
         */
     const currentPurchase = await Purchase.findOne({ _id: req.params.id });
+
+    // eğer bir satın alma işlemi iptal edildiyse productan ilgili ürünün miktarını bir azalt
 
     const data = await Purchase.deleteOne({ _id: req.params.id });
 
