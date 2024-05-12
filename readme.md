@@ -80,17 +80,8 @@
 ```
 
 
+For any questions or feedback, please reach out at baharkse17@gmail.com.
 
-<!-- /* ------------------------------------------------------- *
-{
-    "username": "admin",
-    "password": "aA*123456",
-    "email": "admin@site.com",
-    "firstName": "admin",
-    "lastName": "admin",
-    "isActive": true,
-    "isStaff": true,
-    "isAdmin": true
-}
+
 
 /* ------------------------------------------------------- */ -->
