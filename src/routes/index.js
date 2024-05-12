@@ -20,6 +20,8 @@ router.use("/firms", require("./firm"));
 router.use("/categories", require("./category"));
 // brand
 router.use("/brands", require("./brand"));
+//purchase
+router.use("/purchases", require("./purchase"));
 // // brand:
 // router.use('/brands', require('./brand'))
 // // category:
