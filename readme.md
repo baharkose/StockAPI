@@ -1,4 +1,14 @@
 # STOCK MANAGEMENT API
+StockAPI
+Overview
+StockAPI is a comprehensive solution for managing inventory, sales, and purchases. It allows you to create, update, and track product stocks efficiently, ensuring seamless integration with sales and purchase processes.
+
+Features
+Product Management: Add, update, and manage products in the inventory.
+Sales Handling: Process and record sales, automatically updating product quantities.
+Purchase Handling: Record purchases and update inventory levels.
+User Authentication: Secure user authentication for accessing the API.
+Error Handling: Robust error handling for managing insufficient stock levels and invalid requests.
 
 ### ERD:
 
