@@ -1,14 +1,24 @@
-# STOCK MANAGEMENT API
-StockAPI
-Overview
-StockAPI is a comprehensive solution for managing inventory, sales, and purchases. It allows you to create, update, and track product stocks efficiently, ensuring seamless integration with sales and purchase processes.
+# StockAPI
 
-Features
-Product Management: Add, update, and manage products in the inventory.
-Sales Handling: Process and record sales, automatically updating product quantities.
-Purchase Handling: Record purchases and update inventory levels.
-User Authentication: Secure user authentication for accessing the API.
-Error Handling: Robust error handling for managing insufficient stock levels and invalid requests.
+## Overview
+
+`StockAPI` is a comprehensive solution for managing inventory, sales, and purchases. It allows you to create, update, and track product stocks efficiently, ensuring seamless integration with sales and purchase processes.
+
+## Features
+
+- **Product Management**: Add, update, and manage products in the inventory.
+- **Sales Handling**: Process and record sales, automatically updating product quantities.
+- **Purchase Handling**: Record purchases and update inventory levels.
+- **User Authentication**: Secure user authentication for accessing the API.
+- **Error Handling**: Robust error handling for managing insufficient stock levels and invalid requests.
+
+## Installation
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/yourusername/stockApi.git
+   cd stockApi
 
 ### ERD:
 
@@ -69,6 +79,8 @@ Error Handling: Robust error handling for managing insufficient stock levels and
             user.js
 ```
 
+
+
 <!-- /* ------------------------------------------------------- *
 {
     "username": "admin",
@@ -79,26 +91,6 @@ Error Handling: Robust error handling for managing insufficient stock levels and
     "isActive": true,
     "isStaff": true,
     "isAdmin": true
-}
-{
-    "username": "staff",
-    "password": "aA*123456",
-    "email": "staff@site.com",
-    "firstName": "staff",
-    "lastName": "staff",
-    "isActive": true,
-    "isStaff": true,
-    "isAdmin": false
-}
-{
-    "username": "test",
-    "password": "aA*123456",
-    "email": "test@site.com",
-    "firstName": "test",
-    "lastName": "test",
-    "isActive": true,
-    "isStaff": false,
-    "isAdmin": false
 }
 
 /* ------------------------------------------------------- */ -->
